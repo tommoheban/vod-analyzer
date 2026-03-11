@@ -173,7 +173,7 @@ app.post('/analyze', async (req, res) => {
       return;
     }
 
-    send('progress', { message: '\u23F3 Sending to Gemini for analysis...' });
+    send('progress', { message: '\u23F3 Sending to OpenRouter for analysis...' });
     const report = await analyze(keyword, allPosts);
     send('progress', { message: '\u2705 Analysis complete \u2014 building report...' });
     const html = renderReport(report);
