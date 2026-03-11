@@ -1,0 +1,20 @@
+{
+  "name": "VoD Analyzer",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:20",
+  "postCreateCommand": "npm install && npm start",
+  "forwardPorts": [3000],
+  "portsAttributes": {
+    "3000": { "visibility": "public" }
+  },
+  "secrets": {
+    "GEMINI_API_KEY": {
+      "description": "Google Gemini API key for analysis"
+    },
+    "GH_TOKEN": {
+      "description": "GitHub personal access token for GraphQL API"
+    },
+    "VOD_PASSWORD": {
+      "description": "Password to access the VoD Analyzer UI"
+    }
+  }
+}
