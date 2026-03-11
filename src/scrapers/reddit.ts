@@ -6,7 +6,7 @@ export async function scrapeReddit(keyword: string): Promise<CommonPost[]> {
     headers: { 'User-Agent': 'VoD-Analyzer/1.0 (sentiment analysis tool)' },
   });
   if (!res.ok) throw new Error(`Reddit returned ${res.status}`);
-  const data = await res.json();
+  const data = await res.json() as { data?: { children?: any[] } };
 
   return (data.data?.children || []).map((child: any) => {
     const p = child.data;
