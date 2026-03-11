@@ -7,12 +7,12 @@ export async function analyze(keyword: string, posts: CommonPost[]): Promise<VoD
   const sourceCounts = { reddit: 0, github: 0, stackoverflow: 0, hackernews: 0 };
   for (const p of posts) sourceCounts[p.source]++;
 
-  const postsText = posts.slice(0, 120).map(p =>
-    `[${p.source}] ${p.title}\n${p.body.slice(0, 400)}`
+  const postsText = posts.slice(0, 80).map(p =>
+    `[${p.source}] ${p.title}\n${p.body.slice(0, 300)}`
   ).join('\n---\n');
 
   const model = genAI.getGenerativeModel({
-    model: 'gemini-2.5-flash',
+    model: 'gemini-1.5-flash',
     generationConfig: { responseMimeType: 'application/json' },
   });
 
