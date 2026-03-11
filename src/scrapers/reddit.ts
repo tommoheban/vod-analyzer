@@ -1,9 +1,12 @@
 import { CommonPost } from '../types';
 
 export async function scrapeReddit(keyword: string): Promise<CommonPost[]> {
-  const url = `https://www.reddit.com/search.json?q=${encodeURIComponent(keyword)}&limit=50&sort=relevance`;
+  const url = `https://old.reddit.com/search.json?q=${encodeURIComponent(keyword)}&limit=50&sort=relevance`;
   const res = await fetch(url, {
-    headers: { 'User-Agent': 'VoD-Analyzer/1.0 (sentiment analysis tool)' },
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (compatible; VoD-Analyzer/1.0)',
+      'Accept': 'application/json',
+    },
   });
   if (!res.ok) throw new Error(`Reddit returned ${res.status}`);
   const data = await res.json() as { data?: { children?: any[] } };
