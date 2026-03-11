@@ -15,7 +15,7 @@ export async function analyze(keyword: string, posts: CommonPost[]): Promise<VoD
   ).join('\n---\n');
 
   const response = await client.chat.completions.create({
-    model: 'google/gemini-2.0-flash',
+    model: 'google/gemini-2.0-flash-exp:free',
     response_format: { type: 'json_object' },
     messages: [{
       role: 'user',
