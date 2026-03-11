@@ -22,7 +22,7 @@ export async function scrapeGitHub(keyword: string): Promise<CommonPost[]> {
       }),
     });
     if (!res.ok) throw new Error(`GitHub API ${res.status}`);
-    return res.json();
+    return res.json() as Promise<{ data?: { search?: { nodes?: any[] } } }>;
   };
 
   const [issues, discussions] = await Promise.allSettled([

@@ -5,7 +5,7 @@ export async function scrapeHackerNews(keyword: string): Promise<CommonPost[]> {
     `?query=${encodeURIComponent(keyword)}&tags=comment&hitsPerPage=100`;
   const res = await fetch(url);
   if (!res.ok) throw new Error(`HackerNews returned ${res.status}`);
-  const data = await res.json();
+  const data = await res.json() as { hits?: any[] };
 
   return (data.hits || []).map((hit: any) => ({
     source: 'hackernews' as const,
