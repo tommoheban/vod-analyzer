@@ -1,22 +1,22 @@
-import { ProxyAgent, fetch as proxyFetch } from 'undici';
 import { CommonPost } from '../types';
 
 export async function scrapeReddit(keyword: string): Promise<CommonPost[]> {
-  const proxyUrl = process.env.BRIGHTDATA_PROXY_URL;
-  if (!proxyUrl) throw new Error('BRIGHTDATA_PROXY_URL not set');
+  const apiKey = process.env.BRIGHTDATA_API_KEY;
+  const zone = process.env.BRIGHTDATA_ZONE || 'web_unlocker1';
+  if (!apiKey) throw new Error('BRIGHTDATA_API_KEY not set');
 
-  const dispatcher = new ProxyAgent({
-    uri: proxyUrl,
-    requestTls: { rejectUnauthorized: false },
-    proxyTls: { rejectUnauthorized: false },
+  const targetUrl = `https://www.reddit.com/search.json?q=${encodeURIComponent(keyword)}&limit=50&sort=relevance`;
+
+  const res = await fetch('https://api.brightdata.com/request', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ zone, url: targetUrl, format: 'raw' }),
   });
 
-  const url = `https://www.reddit.com/search.json?q=${encodeURIComponent(keyword)}&limit=50&sort=relevance`;
-  const res = await proxyFetch(url, {
-    dispatcher,
-    headers: { 'User-Agent': 'Mozilla/5.0 (compatible; VoD-Analyzer/1.0)' },
-  });
-  if (!res.ok) throw new Error(`Reddit returned ${res.status}`);
+  if (!res.ok) throw new Error(`Bright Data returned ${res.status}: ${await res.text()}`);
   const data = await res.json() as { data?: { children?: any[] } };
 
   return (data.data?.children || []).map((child: any) => {

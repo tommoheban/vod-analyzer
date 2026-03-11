@@ -17,8 +17,11 @@
     "VOD_PASSWORD": {
       "description": "Password to access the VoD Analyzer UI"
     },
-    "BRIGHTDATA_PROXY_URL": {
-      "description": "Bright Data Web Unlocker proxy URL (from Bright Data dashboard → Web Unlocker → Access Parameters)"
+    "BRIGHTDATA_API_KEY": {
+      "description": "Bright Data API key (dashboard → Account → API Token)"
+    },
+    "BRIGHTDATA_ZONE": {
+      "description": "Bright Data Web Unlocker zone name (defaults to web_unlocker1 if not set)"
     }
   }
 }
