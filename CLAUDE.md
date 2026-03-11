@@ -11,13 +11,13 @@ Voice of Developer Analyzer — TypeScript/Express app that analyzes developer s
 
 - `server.ts` — Express server, serves UI (inline HTML) and handles `/analyze` SSE endpoint
 - `src/scrapers/` — Reddit, GitHub, Stack Overflow, HackerNews scrapers (all normalize to CommonPost)
-- `src/analyzer.ts` — Sends collected posts to Gemini for structured analysis
+- `src/analyzer.ts` — Sends collected posts to OpenRouter for structured analysis
 - `src/report.ts` — Renders VoDReport JSON to an HTML string
 - `src/types.ts` — CommonPost and VoDReport type definitions
 
 ## Secrets
 
-- `GEMINI_API_KEY` — Required for Gemini analysis
+- `OPENROUTER_API_KEY` — Required for OpenRouter analysis
 - `GH_TOKEN` — Required for GitHub GraphQL API
 
 ## Rules

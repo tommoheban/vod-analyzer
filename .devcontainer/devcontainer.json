@@ -8,8 +8,8 @@
     "3000": { "visibility": "public" }
   },
   "secrets": {
-    "GEMINI_API_KEY": {
-      "description": "Google Gemini API key for analysis"
+    "OPENROUTER_API_KEY": {
+      "description": "OpenRouter API key for AI analysis"
     },
     "GH_TOKEN": {
       "description": "GitHub personal access token for GraphQL API"

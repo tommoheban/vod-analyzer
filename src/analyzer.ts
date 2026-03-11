@@ -1,7 +1,10 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import OpenAI from 'openai';
 import { CommonPost, VoDReport } from './types';
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
+const client = new OpenAI({
+  baseURL: 'https://openrouter.ai/api/v1',
+  apiKey: process.env.OPENROUTER_API_KEY || '',
+});
 
 export async function analyze(keyword: string, posts: CommonPost[]): Promise<VoDReport> {
   const sourceCounts = { reddit: 0, github: 0, stackoverflow: 0, hackernews: 0 };
@@ -11,13 +14,12 @@ export async function analyze(keyword: string, posts: CommonPost[]): Promise<VoD
     `[${p.source}] ${p.title}\n${p.body.slice(0, 300)}`
   ).join('\n---\n');
 
-  const model = genAI.getGenerativeModel({
-    model: 'gemini-2.0-flash',
-    generationConfig: { responseMimeType: 'application/json' },
-  });
-
-  const result = await model.generateContent(
-    `Analyze these ${posts.length} developer posts about "${keyword}" from Reddit, GitHub, Stack Overflow, and HackerNews.
+  const response = await client.chat.completions.create({
+    model: 'google/gemini-2.0-flash',
+    response_format: { type: 'json_object' },
+    messages: [{
+      role: 'user',
+      content: `Analyze these ${posts.length} developer posts about "${keyword}" from Reddit, GitHub, Stack Overflow, and HackerNews.
 Source counts: ${JSON.stringify(sourceCounts)}.
 
 Return ONLY valid JSON with this structure:
@@ -43,10 +45,11 @@ Return ONLY valid JSON with this structure:
 
 Posts:
 ${postsText}`,
-  );
+    }],
+  });
 
-  const text = result.response.text();
+  const text = response.choices[0].message.content || '';
   const match = text.match(/\{[\s\S]*\}/);
-  if (!match) throw new Error('Could not parse Gemini response as JSON');
+  if (!match) throw new Error('Could not parse response as JSON');
   return JSON.parse(match[0]);
 }
