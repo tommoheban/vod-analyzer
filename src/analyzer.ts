@@ -10,8 +10,8 @@ export async function analyze(keyword: string, posts: CommonPost[]): Promise<VoD
   const sourceCounts = { reddit: 0, github: 0, stackoverflow: 0, hackernews: 0 };
   for (const p of posts) sourceCounts[p.source]++;
 
-  const postsText = posts.slice(0, 80).map(p =>
-    `[${p.source}] ${p.title}\n${p.body.slice(0, 300)}`
+  const postsText = posts.slice(0, 80).map((p, i) =>
+    `[#${i}][${p.source}] ${p.title}\nURL: ${p.url}\n${p.body.slice(0, 300)}`
   ).join('\n---\n');
 
   const response = await client.chat.completions.create({
@@ -32,16 +32,18 @@ Return ONLY valid JSON with this structure:
     "sentiment_breakdown": { "positive": <number>, "negative": <number>, "mixed": <number> },
     "major_themes": ["theme1", "theme2"]
   },
-  "pros": [{ "title": "", "description": "", "example_quote": "", "frequency": "high|medium|low" }],
-  "cons": [{ "title": "", "description": "", "example_quote": "", "frequency": "high|medium|low" }],
+  "pros": [{ "title": "", "description": "", "example_quote": "", "source_url": "", "frequency": "high|medium|low" }],
+  "cons": [{ "title": "", "description": "", "example_quote": "", "source_url": "", "frequency": "high|medium|low" }],
   "major_issues": [{ "title": "", "description": "", "severity": "critical|high|medium", "examples": [""] }],
   "detailed_findings": {
     "common_themes": [], "recurring_patterns": [],
     "critical_pain_points": [], "praised_features": []
   },
   "recommendations": [""],
-  "notable_quotes": [{ "quote": "", "source": "", "sentiment": "positive|negative|neutral" }]
+  "notable_quotes": [{ "quote": "", "source": "", "source_url": "", "sentiment": "positive|negative|neutral" }]
 }
+
+IMPORTANT: For every example_quote and notable quote, set source_url to the exact URL from the post it came from (the URL: line in each post). If you cannot attribute a quote to a specific post, omit source_url or leave it empty.
 
 Posts:
 ${postsText}`,

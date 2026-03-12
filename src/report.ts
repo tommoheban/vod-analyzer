@@ -2,6 +2,10 @@ import { VoDReport } from './types';
 
 const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
+const srcLink = (url?: string) => url
+  ? ` <a href="${esc(url)}" target="_blank" rel="noopener" title="View original source: ${esc(url)}" style="text-decoration:none;font-size:11px;color:#6366f1;vertical-align:middle;margin-left:4px;white-space:nowrap">&#x1F517; source ↗</a>`
+  : '';
+
 const badge = (text: string, bg: string) =>
   `<span style="background:${bg};color:#fff;padding:2px 8px;border-radius:10px;font-size:12px">${text}</span>`;
 
@@ -47,14 +51,14 @@ export function renderReport(report: VoDReport): string {
   ${pros.map(p => `<div style="border-left:4px solid #16a34a;background:#f0fdf4;padding:14px 16px;margin:0 0 12px;border-radius:0 8px 8px 0">
     <div style="display:flex;justify-content:space-between;align-items:center"><strong>${esc(p.title)}</strong>${badge(p.frequency, freqColor[p.frequency] || '#6b7280')}</div>
     <p style="margin:6px 0;color:#333;font-size:14px">${esc(p.description)}</p>
-    <blockquote style="margin:6px 0 0;padding:6px 12px;border-left:2px solid #86efac;color:#555;font-style:italic;font-size:13px">"${esc(p.example_quote)}"</blockquote>
+    <blockquote style="margin:6px 0 0;padding:6px 12px;border-left:2px solid #86efac;color:#555;font-style:italic;font-size:13px">"${esc(p.example_quote)}"${srcLink(p.source_url)}</blockquote>
   </div>`).join('')}
 
   <h3 style="color:#dc2626;margin:20px 0 12px">Cons</h3>
   ${cons.map(c => `<div style="border-left:4px solid #dc2626;background:#fef2f2;padding:14px 16px;margin:0 0 12px;border-radius:0 8px 8px 0">
     <div style="display:flex;justify-content:space-between;align-items:center"><strong>${esc(c.title)}</strong>${badge(c.frequency, freqColor[c.frequency] || '#6b7280')}</div>
     <p style="margin:6px 0;color:#333;font-size:14px">${esc(c.description)}</p>
-    <blockquote style="margin:6px 0 0;padding:6px 12px;border-left:2px solid #fca5a5;color:#555;font-style:italic;font-size:13px">"${esc(c.example_quote)}"</blockquote>
+    <blockquote style="margin:6px 0 0;padding:6px 12px;border-left:2px solid #fca5a5;color:#555;font-style:italic;font-size:13px">"${esc(c.example_quote)}"${srcLink(c.source_url)}</blockquote>
   </div>`).join('')}
 
   <h3 style="margin:20px 0 12px">Major Issues</h3>
@@ -83,7 +87,7 @@ export function renderReport(report: VoDReport): string {
   <h3 style="margin:24px 0 12px">Notable Quotes</h3>
   ${nq.map(q => `<div style="border-left:4px solid ${sentColor[q.sentiment] || '#6b7280'};padding:10px 16px;margin:0 0 10px;background:#fafafa;border-radius:0 8px 8px 0">
     <p style="margin:0;font-style:italic;font-size:14px">"${esc(q.quote)}"</p>
-    <p style="margin:4px 0 0;font-size:12px;color:#888">&mdash; ${esc(q.source)} (${q.sentiment})</p>
+    <p style="margin:4px 0 0;font-size:12px;color:#888">&mdash; ${esc(q.source)} (${q.sentiment})${srcLink(q.source_url)}</p>
   </div>`).join('')}
 </div>`;
 }

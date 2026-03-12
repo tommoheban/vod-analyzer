@@ -19,11 +19,11 @@ export interface VoDReport {
   };
   pros: Array<{
     title: string; description: string; example_quote: string;
-    frequency: 'high' | 'medium' | 'low';
+    source_url?: string; frequency: 'high' | 'medium' | 'low';
   }>;
   cons: Array<{
     title: string; description: string; example_quote: string;
-    frequency: 'high' | 'medium' | 'low';
+    source_url?: string; frequency: 'high' | 'medium' | 'low';
   }>;
   major_issues: Array<{
     title: string; description: string;
@@ -37,7 +37,7 @@ export interface VoDReport {
   };
   recommendations: string[];
   notable_quotes: Array<{
-    quote: string; source: string;
+    quote: string; source: string; source_url?: string;
     sentiment: 'positive' | 'negative' | 'neutral';
   }>;
 }
