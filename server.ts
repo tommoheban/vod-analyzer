@@ -137,10 +137,10 @@ async function run(){
 function saveReport(){
   var report=document.getElementById('report');
   var kw=report.dataset.keyword||'report';
-  var full='<!DOCTYPE html>\n<html>\n<head>\n<meta charset="utf-8">\n<title>VoD Report: '+kw+'</title>\n'+
-    '<link rel="icon" type="image/png" href="https://github.com/tommoheban.png?size=32">\n'+
-    '<style>body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#f5f5f5;padding:40px 20px}</style>\n'+
-    '</head>\n<body>\n'+report.innerHTML+'\n</body>\n</html>';
+  var full='<!DOCTYPE html><html><head><meta charset="utf-8"><title>VoD Report: '+kw+'</title>'
+    +'<link rel="icon" type="image/png" href="https://github.com/tommoheban.png?size=32">'
+    +'<style>body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#f5f5f5;padding:40px 20px}</style>'
+    +'</head><body>'+report.innerHTML+'</body></html>';
   var blob=new Blob([full],{type:'text/html'});
   var a=document.createElement('a');
   a.href=URL.createObjectURL(blob);
