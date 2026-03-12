@@ -10,7 +10,18 @@ export async function analyze(keyword: string, posts: CommonPost[]): Promise<VoD
   const sourceCounts = { reddit: 0, github: 0, stackoverflow: 0, hackernews: 0 };
   for (const p of posts) sourceCounts[p.source]++;
 
-  const sliced = posts.slice(0, 150);
+  // Balanced sampling: interleave up to 40 posts per source so no source gets cut off
+  const bySource: Record<string, CommonPost[]> = { reddit: [], github: [], stackoverflow: [], hackernews: [] };
+  for (const p of posts) bySource[p.source].push(p);
+  const balanced: CommonPost[] = [];
+  const perSource = 40;
+  for (let i = 0; i < perSource; i++) {
+    for (const src of ['reddit', 'github', 'stackoverflow', 'hackernews']) {
+      if (bySource[src][i]) balanced.push(bySource[src][i]);
+    }
+  }
+  const sliced = balanced.slice(0, 160);
+
   const postsText = sliced.map((p, i) =>
     `[#${i}][${p.source}] ${p.title}\n${p.body.slice(0, 300)}`
   ).join('\n---\n');
