@@ -10,7 +10,18 @@ export async function analyze(keyword: string, posts: CommonPost[]): Promise<VoD
   const sourceCounts = { reddit: 0, github: 0, stackoverflow: 0, hackernews: 0 };
   for (const p of posts) sourceCounts[p.source]++;
 
-  const sliced = posts; // send all collected posts — haiku's 200K context handles it
+  // Interleave posts by source so indices are evenly mixed (not all Reddit first).
+  // This prevents the AI from citing only the lowest-indexed (Reddit) posts.
+  const bySource: Record<string, CommonPost[]> = { reddit: [], github: [], stackoverflow: [], hackernews: [] };
+  for (const p of posts) bySource[p.source].push(p);
+  const interleaved: CommonPost[] = [];
+  const maxLen = Math.max(...Object.values(bySource).map(a => a.length));
+  for (let i = 0; i < maxLen; i++) {
+    for (const src of ['reddit', 'github', 'stackoverflow', 'hackernews']) {
+      if (bySource[src][i]) interleaved.push(bySource[src][i]);
+    }
+  }
+  const sliced = interleaved; // all posts, interleaved
 
   const postsText = sliced.map((p, i) =>
     `[#${i}][${p.source}] ${p.title}\n${p.body.slice(0, 300)}`
