@@ -13,6 +13,13 @@ const freqColor: Record<string, string> = { high: '#dc2626', medium: '#f59e0b', 
 const sevColor: Record<string, string> = { critical: '#dc2626', high: '#f59e0b', medium: '#3b82f6' };
 const sentColor: Record<string, string> = { positive: '#16a34a', negative: '#dc2626', neutral: '#6b7280' };
 
+const findingList = (items: Array<{ text: string; source_url?: string }>, bullet: string) =>
+  `<ul style="padding-left:20px;margin:0">
+    ${items.map(f => `<li style="margin:8px 0;font-size:14px;line-height:1.5">
+      ${esc(f.text)}${srcLink(f.source_url)}
+    </li>`).join('')}
+  </ul>`;
+
 export function renderReport(report: VoDReport): string {
   const { overview: o, pros, cons, major_issues: mi, detailed_findings: df, recommendations: rec, notable_quotes: nq } = report;
   const s = o.sentiment_breakdown;
@@ -32,7 +39,7 @@ export function renderReport(report: VoDReport): string {
     <div style="width:${s.negative/total*100}%;background:#dc2626" title="Negative"></div>
   </div>
   <div style="display:flex;justify-content:space-between;font-size:13px;color:#666;margin-bottom:24px">
-    <span>Positive: ${s.positive}</span><span>Mixed: ${s.mixed}</span><span>Negative: ${s.negative}</span>
+    <span>&#x1F7E2; Positive: ${s.positive}</span><span>&#x1F7E1; Mixed: ${s.mixed}</span><span>&#x1F534; Negative: ${s.negative}</span>
   </div>
 
   <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:28px">
@@ -71,17 +78,23 @@ export function renderReport(report: VoDReport): string {
     </tr>`).join('')}
   </table>
 
-  <h3 style="margin:24px 0 12px">Detailed Findings</h3>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
-    <div><h4 style="color:#dc2626;margin-bottom:8px">Critical Pain Points</h4>
-      <ul style="padding-left:18px;font-size:14px">${df.critical_pain_points.map(p => `<li style="margin:4px 0">${esc(p)}</li>`).join('')}</ul>
-    </div>
-    <div><h4 style="color:#16a34a;margin-bottom:8px">Praised Features</h4>
-      <ul style="padding-left:18px;font-size:14px">${df.praised_features.map(p => `<li style="margin:4px 0">${esc(p)}</li>`).join('')}</ul>
-    </div>
+  <h3 style="color:#16a34a;margin:28px 0 12px">&#x2B50; Praised Features &amp; Technological Promise</h3>
+  <div style="background:#f0fdf4;border-radius:8px;padding:16px 20px">
+    ${findingList(df.praised_features || [], '✓')}
   </div>
 
-  <h3 style="margin:24px 0 12px">Recommendations</h3>
+  <h3 style="color:#dc2626;margin:28px 0 12px">&#x26A0;&#xFE0F; Critical Pain Points</h3>
+  <div style="background:#fef2f2;border-radius:8px;padding:16px 20px">
+    ${findingList(df.critical_pain_points || [], '!')}
+  </div>
+
+  <h3 style="color:#1d4ed8;margin:28px 0 12px">&#x1F501; Recurring Themes &amp; Patterns</h3>
+  <div style="background:#eff6ff;border-radius:8px;padding:16px 20px">
+    ${(df.common_themes || []).length > 0 ? `<p style="margin:0 0 8px;font-weight:600;font-size:13px;color:#1d4ed8">Themes</p>${findingList(df.common_themes, '→')}` : ''}
+    ${(df.recurring_patterns || []).length > 0 ? `<p style="margin:16px 0 8px;font-weight:600;font-size:13px;color:#1d4ed8">Patterns</p>${findingList(df.recurring_patterns, '→')}` : ''}
+  </div>
+
+  <h3 style="margin:28px 0 12px">Recommendations</h3>
   <ol style="padding-left:20px;font-size:14px">${rec.map(r => `<li style="margin:6px 0">${esc(r)}</li>`).join('')}</ol>
 
   <h3 style="margin:24px 0 12px">Notable Quotes</h3>

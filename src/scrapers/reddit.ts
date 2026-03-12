@@ -5,7 +5,7 @@ export async function scrapeReddit(keyword: string): Promise<CommonPost[]> {
   const zone = process.env.BRIGHTDATA_ZONE || 'web_unlocker1';
   if (!apiKey) throw new Error('BRIGHTDATA_API_KEY not set');
 
-  const targetUrl = `https://www.reddit.com/search.json?q=${encodeURIComponent(keyword)}&limit=50&sort=relevance`;
+  const targetUrl = `https://www.reddit.com/search.json?q=${encodeURIComponent(keyword)}&limit=100&sort=relevance`;
 
   const res = await fetch('https://api.brightdata.com/request', {
     method: 'POST',

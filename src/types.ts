@@ -30,10 +30,10 @@ export interface VoDReport {
     severity: 'critical' | 'high' | 'medium'; examples: string[];
   }>;
   detailed_findings: {
-    common_themes: string[];
-    recurring_patterns: string[];
-    critical_pain_points: string[];
-    praised_features: string[];
+    common_themes: Array<{ text: string; source_url?: string }>;
+    recurring_patterns: Array<{ text: string; source_url?: string }>;
+    critical_pain_points: Array<{ text: string; source_url?: string }>;
+    praised_features: Array<{ text: string; source_url?: string }>;
   };
   recommendations: string[];
   notable_quotes: Array<{

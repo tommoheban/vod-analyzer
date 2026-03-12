@@ -10,7 +10,7 @@ export async function analyze(keyword: string, posts: CommonPost[]): Promise<VoD
   const sourceCounts = { reddit: 0, github: 0, stackoverflow: 0, hackernews: 0 };
   for (const p of posts) sourceCounts[p.source]++;
 
-  const sliced = posts.slice(0, 80);
+  const sliced = posts.slice(0, 150);
   const postsText = sliced.map((p, i) =>
     `[#${i}][${p.source}] ${p.title}\n${p.body.slice(0, 300)}`
   ).join('\n---\n');
@@ -23,7 +23,9 @@ export async function analyze(keyword: string, posts: CommonPost[]): Promise<VoD
       content: `Analyze these ${sliced.length} developer posts about "${keyword}" from Reddit, GitHub, Stack Overflow, and HackerNews.
 Source counts: ${JSON.stringify(sourceCounts)}.
 
-Each post is prefixed with [#N] where N is its index number (0-${sliced.length - 1}).
+Each post is prefixed with [#N] where N is its index (0-${sliced.length - 1}).
+
+EVIDENCE RULE: Only include a finding (pro, con, pain point, praised feature, theme, pattern) if it is supported by evidence from AT LEAST 3 different posts. Do not elevate one-off comments to findings. Every finding must reflect a recurring signal across the dataset.
 
 Return ONLY valid JSON with this structure:
 {
@@ -35,18 +37,20 @@ Return ONLY valid JSON with this structure:
     "sentiment_breakdown": { "positive": <number>, "negative": <number>, "mixed": <number> },
     "major_themes": ["theme1", "theme2"]
   },
-  "pros": [{ "title": "", "description": "", "example_quote": "", "source_index": <post #N as integer>, "frequency": "high|medium|low" }],
-  "cons": [{ "title": "", "description": "", "example_quote": "", "source_index": <post #N as integer>, "frequency": "high|medium|low" }],
+  "pros": [{ "title": "", "description": "", "example_quote": "", "source_index": <N>, "frequency": "high|medium|low" }],
+  "cons": [{ "title": "", "description": "", "example_quote": "", "source_index": <N>, "frequency": "high|medium|low" }],
   "major_issues": [{ "title": "", "description": "", "severity": "critical|high|medium", "examples": [""] }],
   "detailed_findings": {
-    "common_themes": [], "recurring_patterns": [],
-    "critical_pain_points": [], "praised_features": []
+    "praised_features": [{ "text": "", "source_index": <N> }],
+    "critical_pain_points": [{ "text": "", "source_index": <N> }],
+    "common_themes": [{ "text": "", "source_index": <N> }],
+    "recurring_patterns": [{ "text": "", "source_index": <N> }]
   },
   "recommendations": [""],
-  "notable_quotes": [{ "quote": "", "source": "", "source_index": <post #N as integer>, "sentiment": "positive|negative|neutral" }]
+  "notable_quotes": [{ "quote": "", "source": "", "source_index": <N>, "sentiment": "positive|negative|neutral" }]
 }
 
-IMPORTANT: For every example_quote and notable quote, set source_index to the integer index N of the post it came from (the [#N] prefix). This is required for source attribution.
+For every item with source_index: set it to the integer index N of the most representative post for that finding (the [#N] prefix). This enables source attribution links.
 
 Posts:
 ${postsText}`,
@@ -57,7 +61,6 @@ ${postsText}`,
   const match = text.match(/\{[\s\S]*\}/);
   if (!match) throw new Error('Could not parse response as JSON');
 
-  // Parse raw response and resolve source_index -> source_url
   const raw = JSON.parse(match[0]) as any;
 
   const resolveUrl = (item: any): string | undefined => {
@@ -68,14 +71,13 @@ ${postsText}`,
     return undefined;
   };
 
-  for (const pro of raw.pros || []) {
-    pro.source_url = resolveUrl(pro);
-  }
-  for (const con of raw.cons || []) {
-    con.source_url = resolveUrl(con);
-  }
-  for (const q of raw.notable_quotes || []) {
-    q.source_url = resolveUrl(q);
+  for (const pro of raw.pros || []) pro.source_url = resolveUrl(pro);
+  for (const con of raw.cons || []) con.source_url = resolveUrl(con);
+  for (const q of raw.notable_quotes || []) q.source_url = resolveUrl(q);
+
+  const df = raw.detailed_findings || {};
+  for (const key of ['praised_features', 'critical_pain_points', 'common_themes', 'recurring_patterns']) {
+    for (const item of df[key] || []) item.source_url = resolveUrl(item);
   }
 
   return raw as VoDReport;

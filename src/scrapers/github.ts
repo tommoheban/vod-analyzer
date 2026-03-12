@@ -10,7 +10,7 @@ export async function scrapeGitHub(keyword: string): Promise<CommonPost[]> {
       headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
         query: `query($q: String!) {
-          search(query: $q, type: ${type}, first: 25) {
+          search(query: $q, type: ${type}, first: 50) {
             nodes {
               ... on Issue { title bodyText url createdAt }
               ... on PullRequest { title bodyText url createdAt }
