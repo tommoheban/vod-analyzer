@@ -32,6 +32,7 @@ function isAuthed(req: express.Request): boolean {
 const loginPage = (error = '') => `<!DOCTYPE html>
 <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>VoD Analyzer - Login</title>
+<link rel="icon" type="image/png" href="https://github.com/tommoheban.png?size=32">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#f5f5f5;padding:40px 20px;display:flex;justify-content:center;align-items:center;min-height:100vh}
@@ -77,6 +78,7 @@ app.get('/', (req, res) => {
   res.type('html').send(`<!DOCTYPE html>
 <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>VoD Analyzer</title>
+<link rel="icon" type="image/png" href="https://github.com/tommoheban.png?size=32">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#f5f5f5;padding:40px 20px}
@@ -100,7 +102,12 @@ button:disabled{background:#93c5fd;cursor:not-allowed}
   </div>
   <div id="progress"></div>
 </div>
-<div id="report" style="max-width:900px;margin:24px auto;padding:0 20px"></div>
+<div id="toolbar" style="max-width:900px;margin:16px auto;padding:0 20px;display:none;justify-content:flex-end">
+  <button onclick="saveReport()" style="padding:8px 18px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:6px">
+    &#x1F4BE; Save Report
+  </button>
+</div>
+<div id="report" style="max-width:900px;margin:0 auto;padding:0 20px"></div>
 <script>
 async function run(){
   var kw=document.getElementById('kw').value.trim();
@@ -120,12 +127,26 @@ async function run(){
         if(!l.startsWith('data: '))continue;
         var e=JSON.parse(l.slice(6));
         if(e.type==='progress')prog.innerHTML+='<p>'+e.message+'</p>';
-        if(e.type==='done')report.innerHTML=e.html;
+        if(e.type==='done'){report.innerHTML=e.html;report.dataset.keyword=kw;document.getElementById('toolbar').style.display='flex';}
         if(e.type==='error')prog.innerHTML+='<p style="color:red">'+e.message+'</p>';
       }
     }
   }catch(err){prog.innerHTML+='<p style="color:red">Error: '+err.message+'</p>';}
   btn.disabled=false;
+}
+function saveReport(){
+  var report=document.getElementById('report');
+  var kw=report.dataset.keyword||'report';
+  var full='<!DOCTYPE html>\n<html>\n<head>\n<meta charset="utf-8">\n<title>VoD Report: '+kw+'</title>\n'+
+    '<link rel="icon" type="image/png" href="https://github.com/tommoheban.png?size=32">\n'+
+    '<style>body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#f5f5f5;padding:40px 20px}</style>\n'+
+    '</head>\n<body>\n'+report.innerHTML+'\n</body>\n</html>';
+  var blob=new Blob([full],{type:'text/html'});
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='vod-report-'+kw.replace(/[^a-z0-9]+/gi,'-').toLowerCase()+'-'+new Date().toISOString().slice(0,10)+'.html';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  URL.revokeObjectURL(a.href);
 }
 </script></body></html>`);
 });
